@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Amigo invisible · la familia de Carla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@500;600;800&display=swap">
+<style>
+:root{
+  --papel:#FAF6EE; --tinta:#3a2f2a; --suave:#8a7d70; --linea:#e4d9c7;
+  --azul:#BFD3E0; --ocre:#EBD3A0; --rosa:#EBC4B8; --salvia:#C9D6BC; --lavanda:#D5CBE0; --crema:#E9DCC6;
+  --lacre:#B5523B;
+  --letra:"Avenir Next","Mulish",-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--papel);color:var(--tinta);font:500 17px/1.45 var(--letra);
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+/* manchas de acuarela del fondo */
+body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 12% 8%, rgba(191,211,224,.45), transparent 70%),
+    radial-gradient(30% 26% at 92% 18%, rgba(235,211,160,.40), transparent 70%),
+    radial-gradient(34% 30% at 85% 92%, rgba(235,196,184,.35), transparent 70%),
+    radial-gradient(30% 28% at 6% 88%, rgba(201,214,188,.40), transparent 70%);
+}
+button{font:inherit;color:inherit}
+.pantalla{display:none;min-height:100svh;min-height:100dvh;
+  padding:max(20px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));
+  max-width:760px;margin:0 auto;flex-direction:column}
+.pantalla.activa{display:flex;animation:entra .45s ease both}
+@keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- cabecera ---------- */
+.cabecera{text-align:center;margin:8px 0 18px}
+.cabecera .ilustracion{display:block;width:min(100%,440px);aspect-ratio:3/2;margin:-6px auto -4px;
+  object-fit:cover;-webkit-mask-image:radial-gradient(ellipse 70% 68% at 50% 52%,#000 60%,transparent 100%);
+  mask-image:radial-gradient(ellipse 70% 68% at 50% 52%,#000 60%,transparent 100%)}
+@media (max-height:420px){.cabecera .ilustracion{width:220px}}
+.cabecera .sello{width:54px;height:54px;margin:0 auto 10px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#cf6d55,var(--lacre) 60%,#8e3b29);
+  color:#fbe9dc;display:grid;place-items:center;font-weight:800;font-size:22px;
+  box-shadow:0 2px 0 rgba(0,0,0,.08),inset 0 -3px 6px rgba(0,0,0,.18)}
+h1{margin:0;font-size:clamp(28px,8vw,40px);font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.sub{margin:6px 0 0;color:var(--suave);font-size:16px}
+
+/* ---------- nombres ---------- */
+.rejilla{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:560px){.rejilla{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:740px){.rejilla{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.persona{position:relative;display:flex;flex-direction:column;align-items:stretch;padding:0;
+  background:#fffdf8;border:1px solid var(--linea);border-radius:16px;overflow:hidden;cursor:pointer;
+  box-shadow:0 1px 0 rgba(58,47,42,.04);transition:transform .15s,box-shadow .15s;min-width:0;text-align:center}
+.persona:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(58,47,42,.10)}
+.persona:active{transform:scale(.98)}
+.persona img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;object-position:50% 12%;background:#f5eee1}
+.persona span{display:block;padding:9px 8px 11px;font-weight:600;font-size:16px;line-height:1.2;
+  overflow-wrap:anywhere}
+.persona .hecho{position:absolute;top:8px;right:8px;background:rgba(255,253,248,.92);
+  border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600;color:#5d7a52;display:none}
+.persona.abierto .hecho{display:block}
+
+/* ---------- código ---------- */
+.volver{align-self:flex-start;background:none;border:0;padding:10px 4px;min-height:44px;
+  color:var(--suave);font-weight:600;cursor:pointer}
+.centro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.retrato{width:min(46vw,190px);aspect-ratio:1/1;border-radius:50%;object-fit:cover;object-position:50% 10%;
+  border:6px solid #fffdf8;box-shadow:0 4px 18px rgba(58,47,42,.12);background:#f5eee1;margin-bottom:8px}
+h2{margin:0;font-size:clamp(24px,7vw,32px);font-weight:800;line-height:1.15}
+.codigo{margin:18px 0 6px;width:min(100%,260px);font:800 34px/1 var(--letra);letter-spacing:.5em;
+  text-align:center;padding:14px 0 14px .5em;border:2px solid var(--linea);border-radius:16px;
+  background:#fffdf8;color:var(--tinta);outline:none}
+.codigo:focus{border-color:#c9b79c}
+.codigo.mal{animation:tiembla .4s;border-color:var(--lacre)}
+@keyframes tiembla{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.aviso{min-height:1.5em;margin:4px 0 8px;color:var(--lacre);font-size:15px;font-weight:600}
+.boton{min-height:52px;padding:0 34px;border:0;border-radius:999px;background:var(--tinta);color:var(--papel);
+  font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.boton:disabled{opacity:.45}
+.boton.claro{background:transparent;color:var(--tinta);border:2px solid var(--tinta);box-shadow:none}
+
+/* ---------- mesa de sobres ---------- */
+.mesa{flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 16px;align-content:center;
+  padding:10px 4px 20px}
+@media (min-width:560px){.mesa{grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 24px}}
+.sobre-btn{background:none;border:0;padding:0;cursor:pointer;min-width:0;transition:transform .2s,opacity .35s}
+.sobre-btn:hover{transform:translateY(-4px) rotate(var(--r)) !important}
+.mesa.eligiendo .sobre-btn{opacity:0;pointer-events:none}
+
+/* el sobre (sirve igual en la mesa y en el escenario) */
+.sobre{position:relative;width:100%;aspect-ratio:1.45/1;perspective:900px}
+.sobre .fondo,.sobre .delante,.sobre .solapa{position:absolute;inset:0;border-radius:6px}
+.sobre .fondo{background:var(--c);filter:brightness(.9);box-shadow:0 6px 14px rgba(58,47,42,.16)}
+.sobre .delante{z-index:3;
+  background:
+    radial-gradient(60% 50% at 25% 80%, rgba(255,255,255,.35), transparent 70%),
+    radial-gradient(50% 60% at 80% 70%, rgba(58,47,42,.06), transparent 70%),
+    var(--c);
+  clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%)}
+.sobre .delante::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent 49.4%,rgba(58,47,42,.10) 50%,transparent 50.6%) left bottom/50% 100% no-repeat,
+             linear-gradient(to top left,transparent 49.4%,rgba(58,47,42,.10) 50%,transparent 50.6%) right bottom/50% 100% no-repeat}
+.sobre .solapa{z-index:4;transform-origin:50% 0;transition:transform .7s cubic-bezier(.5,0,.3,1);
+  background:
+    radial-gradient(50% 60% at 50% 0%, rgba(255,255,255,.30), transparent 70%),
+    var(--c);filter:brightness(.96);
+  clip-path:polygon(0 0,100% 0,50% 60%);}
+.sobre .lacre{position:absolute;z-index:5;left:50%;top:60%;width:17%;aspect-ratio:1;transform:translate(-50%,-62%);
+  border-radius:50%;background:radial-gradient(circle at 35% 30%,#cf6d55,var(--lacre) 60%,#8e3b29);
+  box-shadow:0 2px 3px rgba(0,0,0,.18),inset 0 -2px 4px rgba(0,0,0,.2);
+  display:grid;place-items:center;color:#fbe9dc;font-weight:800;font-size:clamp(11px,3.4vw,18px);
+  transition:opacity .25s}
+.sobre .carta{position:absolute;z-index:2;left:7%;right:7%;top:6%;height:88%;border-radius:4px;
+  background:#fffdf8;overflow:hidden;box-shadow:0 1px 4px rgba(58,47,42,.15);
+  transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.sobre .carta img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
+
+/* escenario de la apertura */
+#escenario{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;
+  background:rgba(250,246,238,.0);transition:background .5s}
+#escenario.activo{display:flex;background:rgba(250,246,238,.92)}
+#escenario .sobre{width:min(82vw,360px);transition:transform .7s cubic-bezier(.3,.7,.2,1),opacity .4s}
+#escenario.abre .solapa{transform:rotateX(180deg)}
+#escenario.abre .lacre{opacity:0}
+#escenario.sale .solapa{z-index:1}
+#escenario.sale .carta{transform:translateY(-72%)}
+#escenario.fuera .sobre{transform:translateY(40vh) scale(.9);opacity:0}
+
+/* tarjeta final */
+#revelado{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));overflow:auto}
+#revelado.activo{display:flex;background:rgba(250,246,238,.96)}
+.tarjeta{position:relative;width:min(100%,380px);background:#fffdf8;border-radius:20px;overflow:hidden;
+  box-shadow:0 18px 50px rgba(58,47,42,.22);text-align:center;animation:crece .7s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes crece{from{opacity:0;transform:translateY(30px) scale(.8)}to{opacity:1;transform:none}}
+.tarjeta img{display:block;width:100%;aspect-ratio:1/1;max-height:52svh;object-fit:cover;object-position:50% 10%;background:#f5eee1}
+.tarjeta .texto{padding:16px 18px 20px}
+.tarjeta .toca{margin:0;color:var(--suave);font-weight:600;font-size:17px}
+.tarjeta .quien{margin:2px 0 6px;font-size:clamp(28px,8.5vw,38px);font-weight:800;line-height:1.1;overflow-wrap:anywhere}
+.tarjeta .shh{margin:0 0 14px;color:var(--suave);font-size:15px}
+.tarjeta .acciones{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* gotas de acuarela que caen */
+.gota{position:fixed;z-index:25;top:-20px;border-radius:50%;pointer-events:none;opacity:.85;
+  animation:cae linear forwards}
+@keyframes cae{to{transform:translateY(110vh) rotate(260deg);opacity:.2}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01s !important;transition-duration:.01s !important}
+}
+@media (max-height:420px){ /* móvil apaisado */
+  .tarjeta{display:flex;width:min(100%,560px);text-align:left;align-items:center}
+  .tarjeta img{width:42%;max-height:none}
+  .tarjeta .acciones{justify-content:flex-start}
+  .retrato{width:96px}
+}
+</style>
+</head>
+<body>
+
+<!-- 1 · ¿Quién eres? -->
+<section class="pantalla activa" id="p-nombres">
+  <header class="cabecera">
+    <img class="ilustracion" src="img/portada.jpg" alt="Sobres de acuarela con lacre, cinta y rodajas de naranja">
+    <h1>Amigo invisible</h1>
+    <p class="sub">de la familia de Carla · pulsa tu nombre</p>
+  </header>
+  <div class="rejilla" id="rejilla"></div>
+</section>
+
+<!-- 2 · Código -->
+<section class="pantalla" id="p-codigo">
+  <button class="volver" data-volver>‹ No soy yo</button>
+  <form class="centro" id="form-codigo" autocomplete="off">
+    <img class="retrato" id="cod-foto" alt="">
+    <h2 id="cod-hola"></h2>
+    <p class="sub" id="cod-texto">Escribe tu código secreto</p>
+    <input class="codigo" id="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+           autocomplete="one-time-code" aria-label="Código secreto de 4 cifras">
+    <p class="aviso" id="aviso" role="status"></p>
+    <button class="boton" id="btn-codigo" type="submit" disabled>Entrar</button>
+  </form>
+</section>
+
+<!-- 3 · Sobres -->
+<section class="pantalla" id="p-sobres">
+  <button class="volver" data-volver>‹ Salir</button>
+  <header class="cabecera" style="margin-top:0">
+    <h2 id="sobres-titulo">Elige un sobre</h2>
+    <p class="sub">Dentro está la persona a la que regalas</p>
+  </header>
+  <div class="mesa" id="mesa"></div>
+</section>
+
+<div id="escenario" aria-hidden="true"></div>
+<div id="revelado" role="dialog" aria-modal="true" aria-labelledby="rev-quien"></div>
+
+<script src="datos.js"></script>
+<script>
+const S = window.SORTEO;
+const GENTE = S.gente;
+const porId = Object.fromEntries(GENTE.map(g => [g.id, g]));
+const COLORES = ["--azul","--ocre","--rosa","--salvia","--lavanda","--crema"];
+const $ = s => document.querySelector(s);
+let yo = null, destino = null;
+
+/* recuerdo en este móvil quién ha abierto ya (solo para la marca ✓) */
+const recuerdo = {
+  leer(){ try { return JSON.parse(localStorage.getItem("ai-abiertos") || "[]"); } catch { return []; } },
+  poner(id){ try { const s = new Set(this.leer()); s.add(id); localStorage.setItem("ai-abiertos", JSON.stringify([...s])); } catch {} }
+};
+
+function ir(id){
+  document.querySelectorAll(".pantalla").forEach(p => p.classList.toggle("activa", p.id === id));
+  window.scrollTo(0,0);
+}
+
+/* ---------- 1 · nombres ---------- */
+function pintaNombres(){
+  const hechos = recuerdo.leer();
+  $("#rejilla").innerHTML = GENTE.map(g => `
+    <button class="persona ${hechos.includes(g.id) ? "abierto" : ""}" data-id="${g.id}">
+      <img src="img/${g.id}.jpg" alt="" loading="lazy">
+      <span>${g.nombre}</span><em class="hecho">✓ abierto</em>
+    </button>`).join("");
+}
+$("#rejilla").addEventListener("click", e => {
+  const b = e.target.closest(".persona"); if (!b) return;
+  yo = porId[b.dataset.id];
+  $("#cod-foto").src = `img/${yo.id}.jpg`;
+  $("#cod-hola").textContent = yo.id === "carla" ? "Sobre de Carla"
+                             : `¡Hola, ${yo.nombre}!`;
+  $("#cod-texto").textContent = yo.id === "carla" ? "Mamá o papá: escribid el código de Carla"
+                              : yo.plural ? "Escribid vuestro código secreto" : "Escribe tu código secreto";
+  $("#codigo").value = ""; $("#aviso").textContent = ""; $("#btn-codigo").disabled = true;
+  ir("p-codigo");
+  setTimeout(() => $("#codigo").focus(), 350);
+});
+document.querySelectorAll("[data-volver]").forEach(b => b.addEventListener("click", () => { pintaNombres(); ir("p-nombres"); }));
+
+/* ---------- 2 · código ---------- */
+const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join("");
+const deHex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x,16)));
+
+async function abreCon(codigo, quien){
+  const sal = new Uint8Array([...deHex(S.sal), ...new TextEncoder().encode(quien)]);
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(codigo), "PBKDF2", false, ["deriveBits"]);
+  const k = new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2", hash:"SHA-256", salt:sal, iterations:S.iter}, base, 256));
+  const sobre = S.sobres[quien];
+  if (hex(k.slice(0,4)) !== sobre.c) return null;
+  return GENTE[sobre.x ^ k[4]] || null;
+}
+
+$("#codigo").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/\D/g,"").slice(0,4);
+  $("#btn-codigo").disabled = e.target.value.length !== 4;
+  $("#aviso").textContent = "";
+  if (e.target.value.length === 4) $("#form-codigo").requestSubmit();
+});
+$("#form-codigo").addEventListener("submit", async e => {
+  e.preventDefault();
+  const c = $("#codigo").value; if (c.length !== 4) return;
+  $("#btn-codigo").disabled = true; $("#btn-codigo").textContent = "Mirando…";
+  let r = null;
+  try { r = await abreCon(c, yo.id); }
+  catch { $("#aviso").textContent = "Este navegador no puede abrir el sobre. Prueba con otro."; }
+  $("#btn-codigo").textContent = "Entrar";
+  if (!r) {
+    if (!$("#aviso").textContent) $("#aviso").textContent = "Ese código no es. Míralo en tu WhatsApp.";
+    const i = $("#codigo"); i.classList.remove("mal"); void i.offsetWidth; i.classList.add("mal");
+    i.value = ""; i.focus(); return;
+  }
+  destino = r;
+  $("#codigo").blur();
+  pintaSobres(); ir("p-sobres");
+});
+
+/* ---------- 3 · sobres ---------- */
+function sobreHTML(color, conCarta){
+  return `<div class="sobre" style="--c:var(${color})">
+    <div class="fondo"></div>
+    ${conCarta ? `<div class="carta"><img src="img/${destino.id}.jpg" alt=""></div>` : ""}
+    <div class="delante"></div><div class="solapa"></div><div class="lacre">C</div>
+  </div>`;
+}
+function pintaSobres(){
+  $("#sobres-titulo").textContent = yo.plural ? "Elegid un sobre" : "Elige un sobre";
+  const mesa = $("#mesa"); mesa.classList.remove("eligiendo");
+  mesa.innerHTML = COLORES.map((c,i) => {
+    const r = (Math.random()*8-4).toFixed(1);
+    return `<button class="sobre-btn" data-c="${c}" aria-label="Sobre ${i+1}"
+      style="--r:${r}deg;transform:rotate(${r}deg)">${sobreHTML(c,false)}</button>`;
+  }).join("");
+  // precarga la imagen de dentro para que no tarde al abrir
+  new Image().src = `img/${destino.id}.jpg`;
+}
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+$("#mesa").addEventListener("click", async e => {
+  const b = e.target.closest(".sobre-btn"); if (!b) return;
+  const desde = b.getBoundingClientRect();
+  $("#mesa").classList.add("eligiendo");
+
+  const esc = $("#escenario");
+  esc.className = ""; esc.innerHTML = sobreHTML(b.dataset.c, true);
+  esc.classList.add("activo");
+  const s = esc.querySelector(".sobre");
+  // el sobre sale de donde estaba y viaja al centro
+  const hasta = s.getBoundingClientRect();
+  const dx = desde.left + desde.width/2 - (hasta.left + hasta.width/2);
+  const dy = desde.top + desde.height/2 - (hasta.top + hasta.height/2);
+  s.style.transition = "none";
+  s.style.transform = `translate(${dx}px,${dy}px) scale(${desde.width/hasta.width})`;
+  void s.offsetWidth;
+  s.style.transition = ""; s.style.transform = "";
+
+  await espera(750);  esc.classList.add("abre");    // se levanta la solapa
+  await espera(420);  esc.classList.add("sale");    // la solapa pasa detrás
+  await espera(950);  esc.classList.add("fuera");   // el sobre se va, queda la tarjeta
+  await espera(250);
+  revela();
+  await espera(400);
+  esc.className = ""; esc.innerHTML = "";
+});
+
+function revela(){
+  recuerdo.poner(yo.id);
+  const toca = yo.id === "carla" ? "Carla regala a" : yo.plural ? "Os toca regalar a" : "Te toca regalar a";
+  const shh = yo.plural ? "Shhh… que no se entere nadie 🤫" : "Shhh… que no se entere nadie 🤫";
+  const rev = $("#revelado");
+  rev.innerHTML = `<div class="tarjeta">
+      <img src="img/${destino.id}.jpg" alt="${destino.nombre}">
+      <div class="texto">
+        <p class="toca">${toca}</p>
+        <p class="quien" id="rev-quien">${destino.a}</p>
+        <p class="shh">${shh}</p>
+        <div class="acciones"><button class="boton" id="listo">Listo</button></div>
+      </div></div>`;
+  rev.classList.add("activo");
+  gotas();
+  $("#listo").addEventListener("click", () => {
+    rev.classList.remove("activo"); rev.innerHTML = "";
+    yo = destino = null; pintaNombres(); ir("p-nombres");
+  });
+}
+
+function gotas(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cs = ["#BFD3E0","#EBD3A0","#EBC4B8","#C9D6BC","#D5CBE0","#B5523B"];
+  for (let i = 0; i < 36; i++) {
+    const g = document.createElement("i"); g.className = "gota";
+    const t = 8 + Math.random()*14;
+    g.style.cssText = `left:${Math.random()*100}vw;width:${t}px;height:${t*(.7+Math.random()*.5)}px;
+      background:${cs[i % cs.length]};animation-duration:${2.4+Math.random()*2.2}s;animation-delay:${Math.random()*.8}s`;
+    document.body.appendChild(g);
+    setTimeout(() => g.remove(), 5500);
+  }
+}
+
+pintaNombres();
+</script>
+</body>
+</html>
