@@ -160,62 +160,86 @@ h2{margin:0;font-size:clamp(24px,7vw,32px);font-weight:800;line-height:1.15}
   .tarjeta .acciones{justify-content:flex-start}
   .retrato{width:96px}
 }
+
+/* ---------- entrada por enlace ---------- */
+[hidden]{display:none !important}
+.nota{margin:0 auto 22px;max-width:460px;text-align:center;font-size:17px;line-height:1.45;
+  background:#fffdf8;border:1px solid var(--linea);border-radius:16px;padding:14px 16px}
+.nota.mal{border-color:var(--lacre);color:var(--lacre);font-weight:600}
+.quienes{margin:0 0 12px;text-align:center;font-size:15px;font-weight:600;color:var(--suave);letter-spacing:.04em;text-transform:uppercase}
+div.persona{cursor:default}
+div.persona:hover{transform:none;box-shadow:0 1px 0 rgba(58,47,42,.04)}
+.bloque{flex:1;display:flex;flex-direction:column}
+.saludo{text-align:center;margin:4px 0 6px}
+.saludo .retrato{width:min(36vw,150px)}
+#otra-vez{align-items:center;justify-content:center;text-align:center;gap:6px}
+.pareja{display:flex;align-items:center;justify-content:center;gap:clamp(14px,5vw,36px);width:100%;margin-bottom:14px}
+.pareja figure{margin:0;flex:0 0 auto;text-align:center}
+.pareja .retrato{width:min(38vw,180px);margin:0}
+.pareja figcaption{font-weight:700;margin-top:6px}
+.sobre-btn.mio{flex:0 1 min(44vw,240px);min-width:0;transform:rotate(-3deg);animation:late 2.4s ease-in-out infinite}
+@keyframes late{0%,100%{transform:rotate(-3deg) scale(1)}50%{transform:rotate(-3deg) scale(1.04)}}
+@media (max-height:420px){.pareja .retrato{width:110px}.sobre-btn.mio{flex-basis:200px}}
 </style>
 </head>
 <body>
 
-<!-- 1 · ¿Quién eres? -->
-<section class="pantalla activa" id="p-nombres">
+<!-- Sin enlace personal (o enlace roto) -->
+<section class="pantalla" id="p-inicio">
   <header class="cabecera">
     <img class="ilustracion" src="img/portada.jpg" alt="Sobres de acuarela con lacre, cinta y rodajas de naranja">
     <h1>Amigo invisible</h1>
-    <p class="sub">Cena de Navidad 2026 · pulsa tu nombre</p>
+    <p class="sub">Cena de Navidad 2026</p>
   </header>
+  <p class="nota" id="inicio-nota">Abre el enlace personal que te han mandado por WhatsApp: con él verás tu sobre.</p>
+  <h3 class="quienes">Quiénes jugamos</h3>
   <div class="rejilla" id="rejilla"></div>
 </section>
 
-<!-- 2 · Código -->
-<section class="pantalla" id="p-codigo">
-  <button class="volver" data-volver>‹ No soy yo</button>
-  <form class="centro" id="form-codigo" autocomplete="off">
-    <img class="retrato" id="cod-foto" alt="">
-    <h2 id="cod-hola"></h2>
-    <p class="sub" id="cod-texto">Escribe tu código secreto</p>
-    <input class="codigo" id="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="4"
-           autocomplete="one-time-code" aria-label="Código secreto de 4 cifras">
-    <p class="aviso" id="aviso" role="status"></p>
-    <button class="boton" id="btn-codigo" type="submit" disabled>Entrar</button>
-  </form>
-</section>
-
-<!-- 3 · Sobres -->
-<section class="pantalla" id="p-sobres">
-  <button class="volver" data-volver>‹ Salir</button>
-  <header class="cabecera" style="margin-top:0">
-    <h2 id="sobres-titulo">Elige un sobre</h2>
-    <p class="sub">Dentro está la persona a la que regalas</p>
+<!-- Con su enlace -->
+<section class="pantalla" id="p-yo">
+  <header class="cabecera">
+    <p class="sub" style="margin-bottom:4px">Amigo invisible · Cena de Navidad 2026</p>
   </header>
-  <div class="mesa" id="mesa"></div>
+
+  <!-- primera vez: elegir sobre -->
+  <div id="primera" class="bloque">
+    <div class="saludo">
+      <img class="retrato" id="yo-foto" alt="">
+      <h2 id="yo-hola"></h2>
+      <p class="sub" id="yo-texto"></p>
+    </div>
+    <div class="mesa" id="mesa"></div>
+  </div>
+
+  <!-- ya abierto en este móvil: su personaje y su sobre al lado -->
+  <div id="otra-vez" class="bloque">
+    <div class="pareja">
+      <figure><img class="retrato" id="yo-foto2" alt=""><figcaption id="yo-nombre2"></figcaption></figure>
+      <button class="sobre-btn mio" id="mi-sobre" aria-label="Volver a ver mi amigo invisible"></button>
+    </div>
+    <h2 id="yo-hola2"></h2>
+    <p class="sub" id="yo-texto2"></p>
+  </div>
 </section>
 
 <div id="escenario" aria-hidden="true"></div>
 <div id="revelado" role="dialog" aria-modal="true" aria-labelledby="rev-quien"></div>
 
-<script>/* datos.js siempre fresco: al barajar cambian los códigos */
+<script>/* datos.js siempre fresco: al barajar cambian los enlaces */
 document.write('<script src="datos.js?t=' + Date.now() + '"><\/script>');</script>
 <script>
 const S = window.SORTEO;
 const V = "?v=20261121c";  /* súbelo al cambiar un retrato */
 const GENTE = S.gente;
-const porId = Object.fromEntries(GENTE.map(g => [g.id, g]));
 const COLORES = ["--azul","--ocre","--rosa","--salvia","--lavanda","--crema"];
 const $ = s => document.querySelector(s);
-let yo = null, destino = null;
+let yo = null, destino = null, clave = "";
 
-/* recuerdo en este móvil quién ha abierto ya (solo para la marca ✓) */
+/* el color del sobre que eligió, recordado en este móvil (si el navegador deja) */
 const recuerdo = {
-  leer(){ try { return JSON.parse(localStorage.getItem("ai-abiertos") || "[]"); } catch { return []; } },
-  poner(id){ try { const s = new Set(this.leer()); s.add(id); localStorage.setItem("ai-abiertos", JSON.stringify([...s])); } catch {} }
+  leer(){ try { return localStorage.getItem("ai-sobre:" + clave); } catch { return null; } },
+  poner(c){ try { localStorage.setItem("ai-sobre:" + clave, c); } catch {} }
 };
 
 function ir(id){
@@ -223,67 +247,62 @@ function ir(id){
   window.scrollTo(0,0);
 }
 
-/* ---------- 1 · nombres ---------- */
-function pintaNombres(){
-  const hechos = recuerdo.leer();
-  $("#rejilla").innerHTML = GENTE.map(g => `
-    <button class="persona ${hechos.includes(g.id) ? "abierto" : ""}" data-id="${g.id}">
-      <img src="img/${g.id}.jpg${V}" alt="" loading="lazy">
-      <span>${g.nombre}</span><em class="hecho">✓ abierto</em>
-    </button>`).join("");
-}
-$("#rejilla").addEventListener("click", e => {
-  const b = e.target.closest(".persona"); if (!b) return;
-  yo = porId[b.dataset.id];
-  $("#cod-foto").src = `img/${yo.id}.jpg${V}`;
-  $("#cod-hola").textContent = yo.id === "carla" ? "Sobre de Carla"
-                             : `¡Hola, ${yo.nombre}!`;
-  $("#cod-texto").textContent = yo.id === "carla" ? "Mamá o papá: escribid el código de Carla"
-                              : yo.plural ? "Escribid vuestro código secreto" : "Escribe tu código secreto";
-  $("#codigo").value = ""; $("#aviso").textContent = ""; $("#btn-codigo").disabled = true;
-  ir("p-codigo");
-  setTimeout(() => $("#codigo").focus(), 350);
-});
-document.querySelectorAll("[data-volver]").forEach(b => b.addEventListener("click", () => { pintaNombres(); ir("p-nombres"); }));
-
-/* ---------- 2 · código ---------- */
 const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join("");
-const deHex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x,16)));
+const sha = async t => new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)));
 
-async function abreCon(codigo, quien){
-  const sal = new Uint8Array([...deHex(S.sal), ...new TextEncoder().encode(quien)]);
-  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(codigo), "PBKDF2", false, ["deriveBits"]);
-  const k = new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2", hash:"SHA-256", salt:sal, iterations:S.iter}, base, 256));
-  const sobre = S.sobres[quien];
-  if (hex(k.slice(0,4)) !== sobre.c) return null;
-  return GENTE[sobre.x ^ k[4]] || null;
+async function arranca(){
+  const m = location.hash.match(/k=([A-Za-z0-9_-]{16,})/);
+  if (!m) return inicio();
+  clave = m[1];
+  let sobre = null, mascara = 0;
+  try {
+    sobre = S.sobres[hex(await sha("quien:" + clave))];
+    mascara = (await sha("sobre:" + clave))[0];
+  } catch {
+    return inicio("Este navegador no puede abrir el sobre. Prueba a abrir el enlace con Chrome o Safari.");
+  }
+  if (!sobre) return inicio("Este enlace no funciona. Comprueba que lo has abierto entero, tal cual llegó por WhatsApp.");
+  yo = GENTE.find(g => g.id === sobre.q);
+  destino = GENTE[sobre.x ^ mascara];
+  new Image().src = `img/${destino.id}.jpg${V}`;  // precarga
+  pintaYo();
+  ir("p-yo");
 }
 
-$("#codigo").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g,"").slice(0,4);
-  $("#btn-codigo").disabled = e.target.value.length !== 4;
-  $("#aviso").textContent = "";
-  if (e.target.value.length === 4) $("#form-codigo").requestSubmit();
-});
-$("#form-codigo").addEventListener("submit", async e => {
-  e.preventDefault();
-  const c = $("#codigo").value; if (c.length !== 4) return;
-  $("#btn-codigo").disabled = true; $("#btn-codigo").textContent = "Mirando…";
-  let r = null;
-  try { r = await abreCon(c, yo.id); }
-  catch { $("#aviso").textContent = "Este navegador no puede abrir el sobre. Prueba con otro."; }
-  $("#btn-codigo").textContent = "Entrar";
-  if (!r) {
-    if (!$("#aviso").textContent) $("#aviso").textContent = "Ese código no es. Míralo en tu WhatsApp.";
-    const i = $("#codigo"); i.classList.remove("mal"); void i.offsetWidth; i.classList.add("mal");
-    i.value = ""; i.focus(); return;
-  }
-  destino = r;
-  $("#codigo").blur();
-  pintaSobres(); ir("p-sobres");
-});
+function inicio(aviso){
+  if (aviso) { $("#inicio-nota").textContent = aviso; $("#inicio-nota").classList.add("mal"); }
+  $("#rejilla").innerHTML = GENTE.map(g => `
+    <div class="persona"><img src="img/${g.id}.jpg${V}" alt="" loading="lazy"><span>${g.nombre}</span></div>`).join("");
+  ir("p-inicio");
+}
 
-/* ---------- 3 · sobres ---------- */
+function textos(){
+  const carla = yo.id === "carla", pl = yo.plural || carla;
+  return {
+    hola: carla ? "El sobre de Carla" : `¡Hola, ${yo.nombre}!`,
+    elige: carla ? "Mamá o papá: elegid un sobre por ella" : pl ? "Elegid un sobre" : "Elige un sobre",
+    otra: carla ? "Tocad el sobre para volver a ver a quién regala Carla"
+                : pl ? "Tocad vuestro sobre para volver a verlo" : "Toca tu sobre para volver a verlo"
+  };
+}
+
+function pintaYo(){
+  const t = textos(), color = recuerdo.leer();
+  $("#yo-foto").src = $("#yo-foto2").src = `img/${yo.id}.jpg${V}`;
+  $("#yo-hola").textContent = $("#yo-hola2").textContent = t.hola;
+  $("#yo-nombre2").textContent = yo.nombre;
+  if (color) {
+    $("#primera").hidden = true; $("#otra-vez").hidden = false;
+    $("#yo-texto2").textContent = t.otra;
+    $("#mi-sobre").dataset.c = color;
+    $("#mi-sobre").innerHTML = sobreHTML(color, false);
+  } else {
+    $("#primera").hidden = false; $("#otra-vez").hidden = true;
+    $("#yo-texto").textContent = t.elige;
+    pintaSobres();
+  }
+}
+
 function sobreHTML(color, conCarta){
   return `<div class="sobre" style="--c:var(${color})">
     <div class="fondo"></div>
@@ -292,22 +311,19 @@ function sobreHTML(color, conCarta){
   </div>`;
 }
 function pintaSobres(){
-  $("#sobres-titulo").textContent = yo.plural ? "Elegid un sobre" : "Elige un sobre";
   const mesa = $("#mesa"); mesa.classList.remove("eligiendo");
   mesa.innerHTML = COLORES.map((c,i) => {
     const r = (Math.random()*8-4).toFixed(1);
     return `<button class="sobre-btn" data-c="${c}" aria-label="Sobre ${i+1}"
       style="--r:${r}deg;transform:rotate(${r}deg)">${sobreHTML(c,false)}</button>`;
   }).join("");
-  // precarga la imagen de dentro para que no tarde al abrir
-  new Image().src = `img/${destino.id}.jpg${V}`;
 }
 const espera = ms => new Promise(r => setTimeout(r, ms));
 
-$("#mesa").addEventListener("click", async e => {
-  const b = e.target.closest(".sobre-btn"); if (!b) return;
+async function abre(b){
   const desde = b.getBoundingClientRect();
   $("#mesa").classList.add("eligiendo");
+  b.style.visibility = "hidden";
 
   const esc = $("#escenario");
   esc.className = ""; esc.innerHTML = sobreHTML(b.dataset.c, true);
@@ -326,29 +342,33 @@ $("#mesa").addEventListener("click", async e => {
   await espera(420);  esc.classList.add("sale");    // la solapa pasa detrás
   await espera(950);  esc.classList.add("fuera");   // el sobre se va, queda la tarjeta
   await espera(250);
+  recuerdo.poner(b.dataset.c);
   revela();
   await espera(400);
-  esc.className = ""; esc.innerHTML = "";
-});
+  esc.className = ""; esc.innerHTML = ""; b.style.visibility = "";
+}
+$("#mesa").addEventListener("click", e => { const b = e.target.closest(".sobre-btn"); if (b) abre(b); });
+$("#mi-sobre").addEventListener("click", e => abre(e.currentTarget));
 
 function revela(){
-  recuerdo.poner(yo.id);
   const toca = yo.id === "carla" ? "Carla regala a" : yo.plural ? "Os toca regalar a" : "Te toca regalar a";
-  const shh = yo.plural ? "Shhh… que no se entere nadie 🤫" : "Shhh… que no se entere nadie 🤫";
   const rev = $("#revelado");
   rev.innerHTML = `<div class="tarjeta">
       <img src="img/${destino.id}.jpg${V}" alt="${destino.nombre}">
       <div class="texto">
         <p class="toca">${toca}</p>
         <p class="quien" id="rev-quien">${destino.a}</p>
-        <p class="shh">${shh}</p>
+        <p class="shh">Shhh… que no se entere nadie 🤫</p>
         <div class="acciones"><button class="boton" id="listo">Listo</button></div>
       </div></div>`;
   rev.classList.add("activo");
   gotas();
   $("#listo").addEventListener("click", () => {
     rev.classList.remove("activo"); rev.innerHTML = "";
-    yo = destino = null; pintaNombres(); ir("p-nombres");
+    pintaYo();
+    // si este navegador no deja recordar, al menos se queda con este sobre mientras siga abierto
+    if (!recuerdo.leer()) { $("#primera").hidden = false; $("#otra-vez").hidden = true; }
+    window.scrollTo(0,0);
   });
 }
 
@@ -365,7 +385,8 @@ function gotas(){
   }
 }
 
-pintaNombres();
+addEventListener("hashchange", () => location.reload());
+arranca();
 </script>
 </body>
 </html>
